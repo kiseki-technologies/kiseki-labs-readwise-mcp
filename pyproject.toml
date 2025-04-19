@@ -1,10 +1,11 @@
 [project]
 name = "kiseki-labs-readwise-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP Server for Readwise"
 readme = "README.md"
 requires-python = ">=3.10.0"
 dependencies = [
+    "dateparser>=1.2.1",
     "fastmcp>=0.4.1",
     "httpx>=0.28.1",
 ]

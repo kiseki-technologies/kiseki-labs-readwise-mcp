@@ -2,7 +2,6 @@
 import asyncio
 import logging
 import os
-import traceback
 from datetime import date
 from typing import List, Optional
 
@@ -126,6 +125,7 @@ async def get_readwise_highlights_by_document_ids(
 
 @mcp.tool()
 async def get_readwise_highlights_by_filters(
+    date_expression: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
     tag_names: List[str] = [],
@@ -134,14 +134,18 @@ async def get_readwise_highlights_by_filters(
     Get highlights from Readwise by filters.
 
     This function retrieves highlights from Readwise based on date range and/or tags.
-    At least one filter (from_date, to_date, or tag_names) must be provided.
+    At least one filter (date_expression, from_date, to_date, or tag_names) must be provided.
 
     Args:
+        date_expression (Optional[str]): A date expression to filter highlights by.
+            This is a string that can be parsed by the `dateparser` library.
+            If provided, highlights created on or after this date will be returned.
         from_date (Optional[date]): The start date to filter highlights (inclusive).
             Highlights created on or after this date will be returned.
         to_date (Optional[date]): The end date to filter highlights (inclusive).
             Highlights created on or before this date will be returned.
         tag_names (List[str]): List of tag names to filter highlights by.
+            This list is made up of strings that should only contain the name of the tags, not the tag ids.
             Only highlights with at least one of these tags will be returned.
 
     Returns:
@@ -151,7 +155,7 @@ async def get_readwise_highlights_by_filters(
         ValueError: If no filters are provided (all parameters are None or empty).
     """
     highlights = await get_highlights_by_filters(
-        READWISE_API_KEY, from_date, to_date, tag_names
+        READWISE_API_KEY, date_expression, from_date, to_date, tag_names
     )
     return highlights
 
