@@ -53,9 +53,11 @@ async def get_data(api_key: str, url: str, params: Optional[Dict] = None, retrie
                         logging.info("Rate limit exceeded. Retrying in 1 second.")
                         await asyncio.sleep(1)
                         continue
+                if response.status_code != 200:
+                    raise Exception(f"Failed to get data from {url}: {response.status_code} {response.text}")
                 return response.json()
             except Exception as e:
                 logging.error(f"Error getting data from {url}: {e}")
                 continue
 
-    raise Exception(f"Failed to get data from {url} after {retries} retries")
+    raise Exception(f"Failed to get data from {url} with params {params} after {retries} retries")

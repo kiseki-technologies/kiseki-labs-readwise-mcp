@@ -20,6 +20,7 @@ from readwise_mcp.tools.readwise.get_highlights import (
 )
 from readwise_mcp.types.book import Book
 from readwise_mcp.types.highlight import Highlight
+from readwise_mcp.utils.duration import parse_duration
 
 load_dotenv()
 
@@ -59,6 +60,7 @@ async def find_readwise_documents_by_names(
 @mcp.tool()
 async def list_readwise_documents_by_filters(
     document_category: str = "",
+    duration_expression: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
 ) -> List[Book]:
@@ -69,6 +71,8 @@ async def list_readwise_documents_by_filters(
         document_category (str, optional): The category of the documents to list in Readwise.
             Allowed values are 'books', 'articles', 'tweets', 'podcasts', 'supplementals',
             or simply empty string '' if no category is specified. Defaults to "".
+        duration_expression (Optional[str]): A duration expression to filter documents by creation date.
+            Valid formats: "1w", "2h", "30m", etc.
         from_date (Optional[date]): The start date to filter documents (inclusive).
             Documents created on or after this date will be returned.
         to_date (Optional[date]): The end date to filter documents (inclusive).
@@ -80,6 +84,13 @@ async def list_readwise_documents_by_filters(
     Raises:
         ValueError: If no filters are provided (all parameters are None or empty).
     """
+
+    if duration_expression and (from_date or to_date):
+        raise ValueError("Cannot provide both duration_expression and from_date or to_date")
+
+    if duration_expression:
+        from_date, to_date = parse_duration(duration_expression)
+
     documents = await list_documents_by_filters(READWISE_API_KEY, document_category, from_date, to_date)
     return documents
 
@@ -121,6 +132,7 @@ async def get_readwise_highlights_by_document_ids(
 
 @mcp.tool()
 async def get_readwise_highlights_by_filters(
+    duration_expression: Optional[str] = None,
     from_date: Optional[date] = None,
     to_date: Optional[date] = None,
     tag_names: List[str] = [],
@@ -132,6 +144,8 @@ async def get_readwise_highlights_by_filters(
     At least one filter (from_date, to_date, or tag_names) must be provided.
 
     Args:
+        duration_expression (Optional[str]): A duration expression to filter highlights by creation date.
+            Valid formats: "1w", "2h", "30m", etc.
         from_date (Optional[date]): The start date to filter highlights (inclusive).
             Highlights created on or after this date will be returned.
         to_date (Optional[date]): The end date to filter highlights (inclusive).
@@ -145,6 +159,13 @@ async def get_readwise_highlights_by_filters(
     Raises:
         ValueError: If no filters are provided (all parameters are None or empty).
     """
+
+    if duration_expression and (from_date or to_date):
+        raise ValueError("Cannot provide both duration_expression and from_date or to_date")
+
+    if duration_expression:
+        from_date, to_date = parse_duration(duration_expression)
+
     highlights = await get_highlights_by_filters(READWISE_API_KEY, from_date, to_date, tag_names)
     return highlights
 
