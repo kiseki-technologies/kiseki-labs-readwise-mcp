@@ -6,6 +6,10 @@ from typing import List, Optional, Set
 # Third Party
 from pydantic import BaseModel, HttpUrl
 
+# Internal Libraries
+# Internal
+from readwise_mcp.types.tag import Tag
+
 
 class BookCategory(str, Enum):
     """Enumeration of valid book categories in Readwise."""
@@ -42,5 +46,5 @@ class Book(BaseModel):
     highlights_url: str
     source_url: Optional[HttpUrl] = None
     asin: Optional[str] = None
-    tags: List[str] = []
+    tags: List[str | Tag] = []
     document_note: str = ""

@@ -1,4 +1,5 @@
 # Standard Library
+import asyncio
 import logging
 from typing import Dict, List, Optional
 
@@ -11,6 +12,8 @@ from readwise_mcp.types.book import BookCategory
 READWISE_API_URL = "https://readwise.io/api/v2"
 
 PAGE_SIZE = 50
+
+DEFAULT_SLEEP_BETWEEN_REQUESTS_IN_SECONDS = 1
 
 
 def to_book_category(category_str: str) -> BookCategory:
@@ -38,6 +41,18 @@ async def get_data(api_key: str, url: str, params: Optional[Dict] = None, retrie
         async with httpx.AsyncClient() as client:
             try:
                 response = await client.get(url, headers={"Authorization": f"Token {api_key}"}, params=params)
+                # Check whether we got a 429 HTTP error
+                if response.status_code == 429:
+                    # Extract the Retry-After header
+                    retry_after = response.headers.get("Retry-After")
+                    if retry_after:
+                        logging.info(f"Rate limit exceeded. Retrying in {retry_after} seconds.")
+                        await asyncio.sleep(int(retry_after))
+                        continue
+                    else:
+                        logging.info("Rate limit exceeded. Retrying in 1 second.")
+                        await asyncio.sleep(1)
+                        continue
                 return response.json()
             except Exception as e:
                 logging.error(f"Error getting data from {url}: {e}")

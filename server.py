@@ -2,9 +2,8 @@
 import asyncio
 import logging
 import os
-import traceback
 from datetime import date
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 # Third Party
 from dotenv import load_dotenv
@@ -12,7 +11,7 @@ from fastmcp import FastMCP
 
 # Internal Libraries
 from readwise_mcp.tools.readwise.get_document import (
-    get_document_by_name,
+    get_documents_by_names,
     list_documents_by_filters,
 )
 from readwise_mcp.tools.readwise.get_highlights import (
@@ -32,28 +31,29 @@ mcp = FastMCP("Kiseki-Labs-Readwise-MCP")
 
 
 @mcp.tool()
-async def find_readwise_document_by_name(
-    document_name: str,
-) -> Book | None:
-    """Find a document in Readwise by name
+async def find_readwise_documents_by_names(
+    document_names: List[str],
+) -> Dict[str, Optional[Book]]:
+    """Find documents in Readwise by a list of names.
 
     Args:
-        document_name (str): The name of the document to search for in Readwise.
-        document_category (str, optional): The category of the document to search for in Readwise.
-            Allowed values are 'books', 'articles', 'tweets', 'podcasts', 'supplementals',
-            or simply empty string '' if no category is specified. Defaults to "".
+        document_names (List[str]): The names of the documents to search for in Readwise.
 
     Returns:
-        A Book object if found, None otherwise.
+        Dict[str, Optional[Book]]: A dictionary where keys are the requested document names
+        and values are the corresponding Book objects if found, or None otherwise.
     """
 
-    logging.info(f"*** Searching for document: {document_name}")
-    doc = await get_document_by_name(READWISE_API_KEY, document_name)
-    if doc:
-        return doc
+    logging.info(f"*** Searching for documents: {', '.join(document_names)}")
+    docs_dict = await get_documents_by_names(READWISE_API_KEY, document_names)
 
-    logging.info(f"*** No document found for {document_name}. Returning None")
-    return None
+    found_count = sum(1 for doc in docs_dict.values() if doc is not None)
+    logging.info(f"*** Found {found_count}/{len(document_names)} documents.")
+    for name, doc in docs_dict.items():
+        if doc is None:
+            logging.info(f"***   - '{name}': Not found")
+
+    return docs_dict
 
 
 @mcp.tool()
@@ -80,9 +80,7 @@ async def list_readwise_documents_by_filters(
     Raises:
         ValueError: If no filters are provided (all parameters are None or empty).
     """
-    documents = await list_documents_by_filters(
-        READWISE_API_KEY, document_category, from_date, to_date
-    )
+    documents = await list_documents_by_filters(READWISE_API_KEY, document_category, from_date, to_date)
     return documents
 
 
@@ -107,10 +105,7 @@ async def get_readwise_highlights_by_document_ids(
         raise ValueError("No document IDs provided")
 
     # Create a list of tasks (co-routines), one for each document ID
-    tasks = [
-        get_highlight_by_document_id(READWISE_API_KEY, doc_id)
-        for doc_id in document_ids
-    ]
+    tasks = [get_highlight_by_document_id(READWISE_API_KEY, doc_id) for doc_id in document_ids]
 
     # Execute all tasks concurrently and gather the results
     results = await asyncio.gather(*tasks)
@@ -150,9 +145,7 @@ async def get_readwise_highlights_by_filters(
     Raises:
         ValueError: If no filters are provided (all parameters are None or empty).
     """
-    highlights = await get_highlights_by_filters(
-        READWISE_API_KEY, from_date, to_date, tag_names
-    )
+    highlights = await get_highlights_by_filters(READWISE_API_KEY, from_date, to_date, tag_names)
     return highlights
 
 

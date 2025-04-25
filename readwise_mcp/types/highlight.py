@@ -5,12 +5,9 @@ from typing import List, Optional
 # Third Party
 from pydantic import BaseModel, HttpUrl
 
-
-class Tag(BaseModel):
-    """Represents a tag associated with a highlight."""
-
-    id: int
-    name: str
+# Internal Libraries
+# Internal
+from readwise_mcp.types.tag import Tag
 
 
 class Highlight(BaseModel):
