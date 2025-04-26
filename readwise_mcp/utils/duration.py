@@ -1,6 +1,7 @@
+# Standard Library
 import re
-from typing import Tuple
 from datetime import date, timedelta
+from typing import Tuple
 
 
 def parse_duration(duration_str: str) -> Tuple[date, date]:

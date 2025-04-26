@@ -1,7 +1,11 @@
-import pytest
+# Standard Library
 from datetime import datetime, timedelta
 from unittest.mock import patch
 
+# Third Party
+import pytest
+
+# Internal Libraries
 # Adjust import path to correctly import from the package
 from readwise_mcp.utils.duration import parse_duration
 

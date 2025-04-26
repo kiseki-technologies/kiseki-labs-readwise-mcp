@@ -1,0 +1,44 @@
+name: Readwise MCP Github Actions
+on:
+  push:
+    branches:
+      - master
+    tags:
+      - v[0-9]+\.[0-9]+\.[0-9]+
+  pull_request:
+    branches:
+      - master
+
+permissions:
+  contents: read
+  id-token: write
+  checks: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+
+    - name: Install the latest version of uv
+      uses: astral-sh/setup-uv@v5
+      with:
+        version: "latest"
+        enable-cache: true
+        cache-suffix: "readwise-mcp"
+
+    - name: Print cache hit
+      if: steps.setup-uv.outputs.cache-hit == 'true'
+      run: echo "Cache was restored"
+
+    - name: Install dependencies
+      run: make install-ci
+
+    - name: Run tests
+      run: make test

@@ -1,12 +1,10 @@
 # Standard Library
+import asyncio
 import logging
-import time
 from datetime import date
 from typing import List, Optional
-import asyncio
 
 # Internal Libraries
-# Company Libraries
 from readwise_mcp.tools.readwise.common import (
     DEFAULT_SLEEP_BETWEEN_REQUESTS_IN_SECONDS,
     READWISE_API_URL,
