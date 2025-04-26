@@ -1,0 +1,9 @@
+---
+description:
+globs: *py,*md
+alwaysApply: false
+---
+* Always ask for clarification from the user if any instructions are unclear
+* Start with the simplest solution possible
+* Only suggest more advanced solutions if the simpler approach doesn't succeed
+* Be terse in your answers: go straight to the point

@@ -1,12 +1,15 @@
 # Standard Library
+import asyncio
 import logging
-import time
 from datetime import date
 from typing import List, Optional
 
 # Internal Libraries
-# Company Libraries
-from readwise_mcp.tools.readwise.common import READWISE_API_URL, get_data
+from readwise_mcp.tools.readwise.common import (
+    DEFAULT_SLEEP_BETWEEN_REQUESTS_IN_SECONDS,
+    READWISE_API_URL,
+    get_data,
+)
 from readwise_mcp.types.highlight import Highlight
 
 
@@ -35,7 +38,7 @@ async def get_highlight_by_document_id(api_key: str, document_id: int) -> List[H
         if not url:
             break
 
-        time.sleep(1)
+        await asyncio.sleep(DEFAULT_SLEEP_BETWEEN_REQUESTS_IN_SECONDS)
 
     return highlights
 
@@ -94,6 +97,6 @@ async def get_highlights_by_filters(
         if not url:
             break
 
-        time.sleep(1)
+        await asyncio.sleep(DEFAULT_SLEEP_BETWEEN_REQUESTS_IN_SECONDS)
 
     return highlights
