@@ -36,6 +36,21 @@ def test_parse_weeks(mocked_today):
     assert parse_duration("0w") == (expected_from, today)
 
 
+def test_parse_days(mocked_today):
+    today = mocked_today
+    # Test standard day
+    expected_from = today - timedelta(days=1)
+    assert parse_duration("1d") == (expected_from, today)
+
+    # Test multiple days
+    expected_from = today - timedelta(days=10)
+    assert parse_duration("10d") == (expected_from, today)
+
+    # Test zero days
+    expected_from = today - timedelta(days=0)
+    assert parse_duration("0d") == (expected_from, today)
+
+
 def test_parse_hours(mocked_today):
     today = mocked_today
     # Test standard hour
@@ -79,7 +94,7 @@ def test_invalid_format_none():
         parse_duration(None)  # type: ignore
 
 
-@pytest.mark.parametrize("invalid_input", ["1d", "1y", "1s", "1W", "1H", "1M"])  # Units are case-sensitive
+@pytest.mark.parametrize("invalid_input", ["1y", "1s", "1W", "1H", "1M"])  # Units are case-sensitive
 def test_invalid_unit(invalid_input):
     # Expect ValueError for invalid units (but caught by the format regex)
     with pytest.raises(ValueError, match="Invalid duration format"):
