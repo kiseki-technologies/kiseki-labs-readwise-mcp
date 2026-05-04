@@ -14,26 +14,25 @@ from readwise_mcp.types.highlight import Highlight
 async def test_list_documents_rejects_duration_with_date():
     """duration_expression and from_date/to_date are mutually exclusive."""
     # Import inside test to avoid server.py side effects at module level
+    # Internal Libraries
     from server import list_readwise_documents_by_filters
 
     with pytest.raises(ValueError, match="Cannot provide both duration_expression and from_date or to_date"):
-        await list_readwise_documents_by_filters(
-            duration_expression="1w", from_date=date(2024, 1, 1)
-        )
+        await list_readwise_documents_by_filters(duration_expression="1w", from_date=date(2024, 1, 1))
 
 
 @pytest.mark.asyncio
 async def test_list_documents_rejects_duration_with_to_date():
+    # Internal Libraries
     from server import list_readwise_documents_by_filters
 
     with pytest.raises(ValueError, match="Cannot provide both duration_expression and from_date or to_date"):
-        await list_readwise_documents_by_filters(
-            duration_expression="1w", to_date=date(2024, 1, 31)
-        )
+        await list_readwise_documents_by_filters(duration_expression="1w", to_date=date(2024, 1, 31))
 
 
 @pytest.mark.asyncio
 async def test_list_documents_parses_duration():
+    # Internal Libraries
     from server import list_readwise_documents_by_filters
 
     with patch("server.list_documents_by_filters", new_callable=AsyncMock) as mock_list:
@@ -49,6 +48,7 @@ async def test_list_documents_parses_duration():
 
 @pytest.mark.asyncio
 async def test_get_highlights_rejects_empty_document_ids():
+    # Internal Libraries
     from server import get_readwise_highlights_by_document_ids
 
     with pytest.raises(ValueError, match="No document IDs provided"):
@@ -57,23 +57,31 @@ async def test_get_highlights_rejects_empty_document_ids():
 
 @pytest.mark.asyncio
 async def test_get_highlights_by_filters_rejects_duration_with_date():
+    # Internal Libraries
     from server import get_readwise_highlights_by_filters
 
     with pytest.raises(ValueError, match="Cannot provide both duration_expression and from_date or to_date"):
-        await get_readwise_highlights_by_filters(
-            duration_expression="1w", from_date=date(2024, 1, 1)
-        )
+        await get_readwise_highlights_by_filters(duration_expression="1w", from_date=date(2024, 1, 1))
 
 
 @pytest.mark.asyncio
 async def test_get_highlights_concurrent_gather():
     """Highlights for multiple document IDs are fetched concurrently."""
+    # Internal Libraries
     from server import get_readwise_highlights_by_document_ids
 
     highlight_json = {
-        "id": 1, "text": "hi", "note": "", "location": 1, "location_type": "order",
-        "highlighted_at": "2024-01-15T10:00:00Z", "url": None, "color": "yellow",
-        "updated": "2024-01-15T10:00:00Z", "book_id": 101, "tags": [],
+        "id": 1,
+        "text": "hi",
+        "note": "",
+        "location": 1,
+        "location_type": "order",
+        "highlighted_at": "2024-01-15T10:00:00Z",
+        "url": None,
+        "color": "yellow",
+        "updated": "2024-01-15T10:00:00Z",
+        "book_id": 101,
+        "tags": [],
     }
     highlight_json_2 = {**highlight_json, "id": 2, "book_id": 202}
 

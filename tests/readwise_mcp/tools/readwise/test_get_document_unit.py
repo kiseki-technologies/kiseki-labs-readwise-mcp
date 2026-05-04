@@ -121,9 +121,7 @@ async def test_list_documents_by_filters_by_category():
 async def test_list_documents_by_filters_by_date_range():
     with patch("readwise_mcp.tools.readwise.get_document.get_data", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = _api_response([SAMPLE_ARTICLE_JSON])
-        result = await list_documents_by_filters(
-            FAKE_API_KEY, from_date=date(2024, 1, 1), to_date=date(2024, 1, 31)
-        )
+        result = await list_documents_by_filters(FAKE_API_KEY, from_date=date(2024, 1, 1), to_date=date(2024, 1, 31))
 
     assert len(result) == 1
     call_params = mock_get.call_args[0][2]

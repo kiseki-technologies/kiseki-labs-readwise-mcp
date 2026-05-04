@@ -3,7 +3,7 @@ import asyncio
 import logging
 import os
 from datetime import date
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 # Third Party
 from dotenv import load_dotenv
@@ -18,8 +18,15 @@ from readwise_mcp.tools.readwise.get_highlights import (
     get_highlight_by_document_id,
     get_highlights_by_filters,
 )
+from readwise_mcp.tools.readwise.manage_tags import (
+    add_tag,
+    delete_tag,
+    get_tags,
+    update_tag,
+)
 from readwise_mcp.types.book import Book
 from readwise_mcp.types.highlight import Highlight
+from readwise_mcp.types.tag import Tag
 from readwise_mcp.utils.duration import parse_duration
 
 load_dotenv()
@@ -168,6 +175,80 @@ async def get_readwise_highlights_by_filters(
 
     highlights = await get_highlights_by_filters(READWISE_API_KEY, from_date, to_date, tag_names)
     return highlights
+
+
+@mcp.tool()
+async def get_readwise_tags(
+    entity_type: Literal["highlights", "books"],
+    entity_id: int,
+) -> List[Tag]:
+    """List all tags on a Readwise highlight or book.
+
+    Args:
+        entity_type (Literal["highlights", "books"]): Whether to get tags from a highlight or a book.
+        entity_id (int): The ID of the highlight or book.
+
+    Returns:
+        List[Tag]: A list of Tag objects for the specified entity.
+    """
+    return await get_tags(READWISE_API_KEY, entity_type, entity_id)
+
+
+@mcp.tool()
+async def add_readwise_tag(
+    entity_type: Literal["highlights", "books"],
+    entity_id: int,
+    tag_name: str,
+) -> Tag:
+    """Add a tag to a Readwise highlight or book.
+
+    Args:
+        entity_type (Literal["highlights", "books"]): Whether to tag a highlight or a book.
+        entity_id (int): The ID of the highlight or book.
+        tag_name (str): The name of the tag to add.
+            Max 127 characters for highlights, 512 for books.
+
+    Returns:
+        Tag: The created Tag object.
+    """
+    return await add_tag(READWISE_API_KEY, entity_type, entity_id, tag_name)
+
+
+@mcp.tool()
+async def update_readwise_tag(
+    entity_type: Literal["highlights", "books"],
+    entity_id: int,
+    tag_id: int,
+    new_tag_name: str,
+) -> Tag:
+    """Rename a tag on a Readwise highlight or book.
+
+    Args:
+        entity_type (Literal["highlights", "books"]): Whether the tag belongs to a highlight or a book.
+        entity_id (int): The ID of the highlight or book.
+        tag_id (int): The ID of the tag to rename.
+        new_tag_name (str): The new name for the tag.
+
+    Returns:
+        Tag: The updated Tag object.
+    """
+    return await update_tag(READWISE_API_KEY, entity_type, entity_id, tag_id, new_tag_name)
+
+
+@mcp.tool()
+async def delete_readwise_tag(
+    entity_type: Literal["highlights", "books"],
+    entity_id: int,
+    tag_id: int,
+) -> None:
+    """Remove a tag from a Readwise highlight or book.
+
+    Args:
+        entity_type (Literal["highlights", "books"]): Whether the tag belongs to a highlight or a book.
+        entity_id (int): The ID of the highlight or book.
+        tag_id (int): The ID of the tag to remove.
+    """
+    await delete_tag(READWISE_API_KEY, entity_type, entity_id, tag_id)
 
 
 # Add a dynamic greeting resource

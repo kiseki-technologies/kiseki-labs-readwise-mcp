@@ -121,9 +121,7 @@ async def test_get_highlights_by_filters_no_filters_raises():
 async def test_get_highlights_by_filters_pagination_with_tags():
     with patch("readwise_mcp.tools.readwise.get_highlights.get_data", new_callable=AsyncMock) as mock_get:
         mock_get.side_effect = [
-            _api_response(
-                [SAMPLE_HIGHLIGHT_NO_TAGS_JSON], next_url="https://readwise.io/api/v2/highlights/?page=2"
-            ),
+            _api_response([SAMPLE_HIGHLIGHT_NO_TAGS_JSON], next_url="https://readwise.io/api/v2/highlights/?page=2"),
             _api_response([SAMPLE_HIGHLIGHT_JSON]),
         ]
         result = await get_highlights_by_filters(
